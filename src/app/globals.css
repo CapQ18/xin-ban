@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+:root {
+  --foreground-rgb: 70, 65, 60;
+  --background-start-rgb: 255, 248, 240;
+  --background-end-rgb: 255, 250, 245;
+  --background: oklch(0.99 0.005 80);
+  --foreground: oklch(0.35 0.02 45);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.35 0.02 45);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.35 0.02 45);
+  --primary: oklch(0.65 0.15 340);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.02 90);
+  --secondary-foreground: oklch(0.45 0.03 90);
+  --muted: oklch(0.97 0.01 80);
+  --muted-foreground: oklch(0.55 0.02 45);
+  --accent: oklch(0.92 0.05 30);
+  --accent-foreground: oklch(0.45 0.05 30);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.015 80);
+  --input: oklch(0.95 0.01 80);
+  --ring: oklch(0.65 0.15 340);
+  --radius: 0.875rem;
+  --warm-pink: oklch(0.75 0.12 350);
+  --warm-orange: oklch(0.75 0.15 50);
+  --warm-green: oklch(0.70 0.12 145);
+  --warm-blue: oklch(0.70 0.10 220);
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(180deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
+  min-height: 100vh;
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+body.theme-starry {
+  background: linear-gradient(to bottom, #0f172a, #1e1b4b);
+  color: #f1f5f9;
+}
+
+body.theme-forest {
+  background: linear-gradient(to bottom, #dcfce7, #86efac);
+}
+
+body.theme-lake {
+  background: linear-gradient(to bottom, #cffafe, #67e8f9);
+}
+
+body.theme-white {
+  background: linear-gradient(to bottom, #ffffff, #f3f4f6);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes stars {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes leaves {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(10px) rotate(5deg); }
+}
+
+@keyframes waves {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes throwOut {
+  0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateX(100vw) translateY(-50vh) rotate(720deg); opacity: 0; }
+}
+
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+.animate-bounce-soft { animation: bounce-soft 0.3s ease-in-out; }
+.animate-gradient-flow { 
+  animation: gradient-flow 8s ease infinite; 
+  background-size: 200% 200%;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: stars 2s ease-in-out infinite;
+}
+
+.leaf {
+  position: absolute;
+  font-size: 2rem;
+  animation: leaves 3s ease-in-out infinite;
+}
+
+.wave {
+  position: absolute;
+  background: rgba(96, 165, 250, 0.2);
+  border-radius: 50%;
+  animation: waves 4s ease-in-out infinite;
+}
+
+.confetti {
+  position: fixed;
+  animation: confetti 3s ease-out forwards;
+}
+
+.throw-animation {
+  animation: throwOut 1s ease-out forwards;
+}
+
+.glass-effect {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.soft-shadow {
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+}
