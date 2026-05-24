@@ -1,4 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 心伴 - 情绪陪伴助手
+
+「心伴」是一款温暖治愈的大学生情绪陪伴助手 Web 应用，帮助用户记录心情、管理任务、保持专注。
+
+## 功能特色
+
+- 🌟 **专注计时器** - 番茄钟专注计时，支持自定义时长
+- 💬 **AI 树洞** - 情绪倾诉聊天，智能共情回复
+- 📅 **任务规划** - 主线/支线任务管理，进度追踪
+- 📝 **点滴日志** - 心情记录，时间轴展示
+- 📊 **情绪日历** - 可视化情绪趋势
+- 🎵 **治愈电台** - 白噪音播放器
+- 🆘 **紧急求助** - 心理援助热线
+
+## 技术栈
+
+- Next.js 14 + TypeScript
+- Tailwind CSS 3
+- shadcn/ui
+- Recharts（图表）
 
 ## Getting Started
 

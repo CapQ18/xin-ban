@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "考研陪伴助手",
-  description: "陪伴你度过考研时光",
+  title: "心伴",
+  description: "温暖治愈的情绪陪伴助手",
 };
 
 export default function RootLayout({
