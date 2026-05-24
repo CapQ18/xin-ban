@@ -261,6 +261,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
             className={`w-20 h-20 rounded-full p-0 transition-all hover-lift ${
               isBreak ? 'bg-amber-400 hover:bg-amber-500' : ''
             } ${(!isRunning && showMoodSelector && (!selectedMood || !goal.trim())) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={(!isRunning && showMoodSelector && (!selectedMood || !goal.trim())) ? '请先选择心情并输入目标' : ''}
           >
             {isRunning ? (
               <Pause className="w-8 h-8" />

@@ -15,7 +15,13 @@ export function WhiteNoisePlayer() {
 
   useEffect(() => {
     return () => {
-      stopNoise();
+      if (noiseNodeRef.current) {
+        try {
+          noiseNodeRef.current.stop();
+        } catch (e) {
+          console.log('Audio cleanup');
+        }
+      }
     };
   }, []);
 
@@ -25,12 +31,20 @@ export function WhiteNoisePlayer() {
     }
   }, [volume]);
 
-  const createWhiteNoise = () => {
+  const initAudioContext = () => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
+      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     }
+    if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+    return audioContextRef.current;
+  };
 
-    const audioContext = audioContextRef.current;
+  const createWhiteNoise = () => {
+    const audioContext = initAudioContext();
+    if (!audioContext) return null;
+
     const bufferSize = 2 * audioContext.sampleRate;
     const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
     const output = noiseBuffer.getChannelData(0);
@@ -70,18 +84,20 @@ export function WhiteNoisePlayer() {
     stopNoise();
     
     const whiteNoise = createWhiteNoise();
-    whiteNoise.start();
-    setIsPlaying(true);
+    if (whiteNoise) {
+      whiteNoise.start();
+      setIsPlaying(true);
+    }
   };
 
   const stopNoise = () => {
     if (noiseNodeRef.current) {
-      noiseNodeRef.current.stop();
+      try {
+        noiseNodeRef.current.stop();
+      } catch (e) {
+        console.log('Audio already stopped');
+      }
       noiseNodeRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
     }
     setIsPlaying(false);
   };
