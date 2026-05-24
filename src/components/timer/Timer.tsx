@@ -157,20 +157,22 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
             {moodOptions.map((mood) => (
-              <Button
+              <button
                 key={mood.value}
-                variant={selectedMood === mood.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedMood(mood.value)}
-                className={`rounded-full px-4 py-2 transition-all hover-lift ${
+                type="button"
+                onClick={() => {
+                  console.log('Clicked mood:', mood.value);
+                  setSelectedMood(mood.value);
+                }}
+                className={`rounded-full px-4 py-2 transition-all hover:scale-105 active:scale-95 ${
                   selectedMood === mood.value 
                     ? 'bg-primary text-primary-foreground' 
-                    : 'bg-secondary/50 hover:bg-secondary'
+                    : 'bg-secondary/50 hover:bg-secondary text-foreground border border-input'
                 }`}
               >
                 <span className="text-lg">{mood.emoji}</span>
                 <span className="ml-1 text-sm">{mood.label}</span>
-              </Button>
+              </button>
             ))}
           </div>
 
