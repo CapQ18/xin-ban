@@ -95,10 +95,11 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   const toggleTimer = () => {
-    if (!isRunning && showMoodSelector && (!selectedMood || !goal.trim())) {
-      return;
-    }
-    if (showMoodSelector && selectedMood && goal.trim()) {
+    if (!isRunning && showMoodSelector) {
+      if (!selectedMood && !goal.trim()) {
+        setSelectedMood('neutral');
+        setGoal('无目标');
+      }
       setShowMoodSelector(false);
     }
     setIsRunning(!isRunning);
@@ -152,7 +153,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
         <div className="mb-6 animate-fade-in-up space-y-4 w-full">
           <div className="flex items-center gap-2 mb-2">
             <Smile className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">开始前，你的心情是？</span>
+            <span className="text-sm font-medium text-muted-foreground">开始前，你的心情是？（可选）</span>
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
             {moodOptions.map((mood) => (
@@ -175,7 +176,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
 
           <div className="flex items-center gap-2 mb-2 mt-4">
             <Target className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">今日小目标</span>
+            <span className="text-sm font-medium text-muted-foreground">今日小目标（可选）</span>
           </div>
           <Input
             value={goal}
@@ -257,11 +258,9 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
           <Button
             size="lg"
             onClick={toggleTimer}
-            disabled={!isRunning && showMoodSelector && (!selectedMood || !goal.trim())}
             className={`w-20 h-20 rounded-full p-0 transition-all hover-lift ${
               isBreak ? 'bg-amber-400 hover:bg-amber-500' : ''
-            } ${(!isRunning && showMoodSelector && (!selectedMood || !goal.trim())) ? 'opacity-50 cursor-not-allowed' : ''}`}
-            title={(!isRunning && showMoodSelector && (!selectedMood || !goal.trim())) ? '请先选择心情并输入目标' : ''}
+            }`}
           >
             {isRunning ? (
               <Pause className="w-8 h-8" />
