@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Coffee, Smile, Target, Star } from 'lucide-react';
+import { Play, Pause, RotateCcw, Coffee, Smile, Target, Star, Radio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
+import { whiteNoiseOptions } from '@/types';
+import { useWhiteNoise } from '@/contexts/WhiteNoiseContext';
+import { getPartnerProfile, addIntimacyPoints, addChatMessage, getCareResponse } from '@/lib/partner';
 
 interface FocusRecord {
   id: string;
@@ -48,6 +51,9 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [rating, setRating] = useState(0);
   const [qualityScore, setQualityScore] = useState(0);
+  const [backgroundSound, setBackgroundSound] = useState<string | null>(null);
+  
+  const { playSound, stopSound, currentSound, isPlaying: isSoundPlaying } = useWhiteNoise();
 
   const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -72,6 +78,9 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
         setQualityScore(randomQuality);
         setShowRatingModal(true);
         setIsRunning(false);
+        if (backgroundSound) {
+          stopSound();
+        }
       } else {
         setIsBreak(false);
         setTimeLeft(duration * 60);
@@ -81,7 +90,13 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
       }
     }
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft, isBreak, duration]);
+  }, [isRunning, timeLeft, isBreak, duration, backgroundSound, stopSound]);
+
+  useEffect(() => {
+    if (isRunning && !isBreak && backgroundSound && currentSound !== backgroundSound) {
+      playSound(backgroundSound);
+    }
+  }, [isRunning, isBreak, backgroundSound, currentSound, playSound]);
 
   const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -128,6 +143,16 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
     };
     
     onComplete(newRecord);
+    
+    addIntimacyPoints('focus', 5);
+    
+    const partnerProfile = getPartnerProfile();
+    if (partnerProfile) {
+      const careMessage = getCareResponse(partnerProfile.personality, 'focusComplete');
+      if (careMessage) {
+        addChatMessage(careMessage, 'partner');
+      }
+    }
     
     setIsBreak(true);
     setTimeLeft(5 * 60);
@@ -186,6 +211,30 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
             placeholder="今天想完成什么？"
             className="w-full"
           />
+
+          <div className="mt-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Radio className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium text-muted-foreground">背景音（可选）</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {whiteNoiseOptions.map((sound) => (
+                <button
+                  key={sound.id}
+                  type="button"
+                  onClick={() => setBackgroundSound(backgroundSound === sound.id ? null : sound.id)}
+                  className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all hover:scale-105 ${
+                    backgroundSound === sound.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary/50 hover:bg-secondary border border-input'
+                  }`}
+                >
+                  <span className="text-xl">{sound.icon}</span>
+                  <span className="text-xs">{sound.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

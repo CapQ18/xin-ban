@@ -1,194 +1,104 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Radio, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, Radio } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 import { whiteNoiseOptions } from '@/types';
+import { useWhiteNoise } from '@/contexts/WhiteNoiseContext';
+
+const timerOptions = [
+  { label: '15分钟', value: 15 },
+  { label: '30分钟', value: 30 },
+  { label: '60分钟', value: 60 },
+];
 
 export function WhiteNoisePlayer() {
-  const [selectedSound, setSelectedSound] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const noiseNodeRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  const { 
+    currentSound, 
+    isPlaying, 
+    volume, 
+    timerDuration, 
+    timerRemaining,
+    playSound, 
+    setVolume, 
+    setTimer 
+  } = useWhiteNoise();
 
-  useEffect(() => {
-    return () => {
-      if (noiseNodeRef.current) {
-        try {
-          noiseNodeRef.current.stop();
-        } catch (e) {
-          console.log('Audio cleanup');
-        }
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = volume;
-    }
-  }, [volume]);
-
-  const initAudioContext = () => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    }
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume();
-    }
-    return audioContextRef.current;
-  };
-
-  const createWhiteNoise = () => {
-    const audioContext = initAudioContext();
-    if (!audioContext) return null;
-
-    const bufferSize = 2 * audioContext.sampleRate;
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
-    }
-
-    const whiteNoise = audioContext.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-    whiteNoise.loop = true;
-
-    const gainNode = audioContext.createGain();
-    gainNode.gain.value = volume;
-
-    const filterNode = audioContext.createBiquadFilter();
-    filterNode.type = 'lowpass';
-    filterNode.frequency.value = selectedSound === 'rain' ? 800 : 
-                                 selectedSound === 'forest' ? 1200 :
-                                 selectedSound === 'waves' ? 600 :
-                                 selectedSound === 'cafe' ? 2000 :
-                                 selectedSound === 'fire' ? 400 : 1500;
-
-    whiteNoise.connect(filterNode);
-    filterNode.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    noiseNodeRef.current = whiteNoise;
-    gainNodeRef.current = gainNode;
-
-    return whiteNoise;
-  };
-
-  const startNoise = () => {
-    if (!selectedSound) return;
-    
-    stopNoise();
-    
-    const whiteNoise = createWhiteNoise();
-    if (whiteNoise) {
-      whiteNoise.start();
-      setIsPlaying(true);
-    }
-  };
-
-  const stopNoise = () => {
-    if (noiseNodeRef.current) {
-      try {
-        noiseNodeRef.current.stop();
-      } catch (e) {
-        console.log('Audio already stopped');
-      }
-      noiseNodeRef.current = null;
-    }
-    setIsPlaying(false);
-  };
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      stopNoise();
-    } else {
-      startNoise();
-    }
-  };
-
-  const selectSound = (soundId: string) => {
-    if (selectedSound === soundId) {
-      togglePlay();
-    } else {
-      setSelectedSound(soundId);
-      if (isPlaying) {
-        startNoise();
-      }
-    }
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
     <div className="bg-card rounded-3xl p-6 soft-shadow">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-6">
         <Radio className="w-5 h-5 text-primary" />
         <h3 className="font-medium">治愈电台</h3>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        {whiteNoiseOptions.map((sound) => (
-          <Button
-            key={sound.id}
-            variant={selectedSound === sound.id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => selectSound(sound.id)}
-            className={`flex flex-col items-center gap-1 py-3 transition-all hover-lift ${
-              selectedSound === sound.id ? 'bg-primary text-primary-foreground' : ''
-            }`}
-          >
-            <span className="text-2xl">{sound.icon}</span>
-            <span className="text-xs">{sound.name}</span>
-          </Button>
-        ))}
-      </div>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+          {whiteNoiseOptions.map((sound) => (
+            <button
+              key={sound.id}
+              onClick={() => playSound(sound.id)}
+              className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl transition-all hover:scale-105 active:scale-95 ${
+                currentSound === sound.id
+                  ? 'bg-primary text-primary-foreground shadow-lg'
+                  : 'bg-secondary/50 hover:bg-secondary border border-input'
+              }`}
+            >
+              <span className="text-3xl">{sound.icon}</span>
+              <span className="text-sm font-medium">{sound.name}</span>
+              {currentSound === sound.id && isPlaying && (
+                <div className="flex gap-1 mt-1">
+                  <div className="w-1 h-3 bg-current rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
+                  <div className="w-1 h-4 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-1 h-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
 
-      {selectedSound && (
+      {currentSound && (
         <div className="space-y-4 animate-fade-in-up">
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => setVolume(Math.max(0, volume - 0.1))}
-              disabled={volume === 0}
-            >
-              <VolumeX className="w-5 h-5" />
-            </Button>
-            
-            <Button
-              size="lg"
-              onClick={togglePlay}
-              className="w-16 h-16 rounded-full p-0 transition-all hover-lift"
-            >
-              {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => setVolume(Math.min(1, volume + 0.1))}
-              disabled={volume === 1}
-            >
-              <Volume2 className="w-5 h-5" />
-            </Button>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>音量</span>
+              <span>{volume}%</span>
+            </div>
+            <Slider
+              min={0}
+              max={100}
+              value={[volume]}
+              onValueChange={([val]) => setVolume(val)}
+            />
           </div>
 
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={volume}
-            onChange={(e) => setVolume(parseFloat(e.target.value))}
-            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer"
-          />
-          
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>静音</span>
-            <span>{Math.round(volume * 100)}%</span>
-            <span>最大</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">定时关闭</span>
+            </div>
+            {timerRemaining !== null && (
+              <div className="text-center text-lg font-medium text-primary mb-2">
+                {formatTime(timerRemaining)}
+              </div>
+            )}
+            <div className="flex gap-2">
+              {timerOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={timerDuration === option.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimer(timerDuration === option.value ? null : option.value)}
+                  className="flex-1"
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -1,14 +1,14 @@
 'use client';
 
-import { Clock, MessageCircleHeart, Calendar, User, Target, BookOpen, Sparkles } from 'lucide-react';
+import { Clock, MessageCircleHeart, Calendar, User, Target, BookOpen, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
   { label: '专注', href: '/', icon: Clock },
   { label: '树洞', href: '/chat', icon: MessageCircleHeart },
+  { label: '伙伴', href: '/partner', icon: Heart },
   { label: '任务', href: '/tasks', icon: Target },
-  { label: '日志', href: '/journal', icon: BookOpen },
   { label: '我的', href: '/profile', icon: User },
 ];
 

@@ -5,6 +5,9 @@ import { Timer } from '@/components/timer/Timer';
 import { TimerStats } from '@/components/timer/TimerStats';
 import { BottomNav } from '@/components/ui/BottomNav';
 import { MoodCheckIn } from '@/components/mood/MoodCheckIn';
+import { WhiteNoisePlayer } from '@/components/radio/WhiteNoisePlayer';
+import { WhiteNoiseBar } from '@/components/radio/WhiteNoiseBar';
+import { WhiteNoiseProvider } from '@/contexts/WhiteNoiseContext';
 import { Heart, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -18,7 +21,7 @@ interface FocusRecord {
   goal: string;
 }
 
-export default function Home() {
+function HomeContent() {
   const [todayMinutes, setTodayMinutes] = useState(0);
   const [todayTomatoes, setTodayTomatoes] = useState(0);
 
@@ -62,10 +65,23 @@ export default function Home() {
           <Timer onComplete={handleComplete} defaultDuration={25} />
         </div>
 
+        <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <WhiteNoisePlayer />
+        </div>
+
         <TimerStats todayMinutes={todayMinutes} todayTomatoes={todayTomatoes} />
       </div>
+      <WhiteNoiseBar />
       <MoodCheckIn />
       <BottomNav />
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <WhiteNoiseProvider>
+      <HomeContent />
+    </WhiteNoiseProvider>
   );
 }
