@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Heart, Moon, Zap, BookOpen, Sparkles, User } from 'lucide-react';
+import { ArrowLeft, Moon, Zap, BookOpen, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 import { savePartnerProfile, addChatMessage } from '@/lib/partner';
 import { PartnerProfile, PersonalityType, personalityOptions, avatarOptions, genderOptions } from '@/types';
 
@@ -20,8 +21,9 @@ export default function CreatePartnerPage() {
   const [step, setStep] = useState(1);
   const [personality, setPersonality] = useState<PersonalityType>('gentle');
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('🐱');
+  const [avatar, setAvatar] = useState<string>('🐱');
   const [gender, setGender] = useState<string>('');
+  const [showCustomUpload, setShowCustomUpload] = useState(false);
   
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -106,9 +108,11 @@ export default function CreatePartnerPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-4xl mx-auto mb-2">
-                  {avatar}
-                </div>
+                <ImageUpload 
+                  value={avatar.startsWith('data:') ? avatar : ''} 
+                  onChange={setAvatar}
+                  size={100}
+                />
                 <h2 className="text-lg font-medium text-foreground mb-1">自定义伙伴信息</h2>
                 <p className="text-sm text-muted-foreground">给你的伙伴起个名字吧~</p>
               </div>
@@ -129,33 +133,63 @@ export default function CreatePartnerPage() {
                 </p>
               </div>
               
-              <div>
+              <div className="relative z-10">
                 <label className="block text-sm font-medium text-foreground mb-3">选择头像</label>
-                <div className="grid grid-cols-4 gap-3">
-                  {avatarOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() => setAvatar(option.emoji)}
-                      className={`p-3 rounded-xl transition-all hover:scale-110 ${
-                        avatar === option.emoji
-                          ? 'bg-primary/20 ring-2 ring-primary'
-                          : 'bg-secondary/50 hover:bg-secondary'
-                      }`}
+                
+                {!avatar.startsWith('data:') && (
+                  <div className="grid grid-cols-4 gap-3 mb-3">
+                    {avatarOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setAvatar(option.emoji)}
+                        className={`p-3 rounded-xl transition-all hover:scale-110 active:scale-95 ${
+                          avatar === option.emoji
+                            ? 'bg-primary/20 ring-2 ring-primary'
+                            : 'bg-secondary/50 hover:bg-secondary'
+                        }`}
+                      >
+                        <span className="text-3xl">{option.emoji}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={showCustomUpload ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowCustomUpload(!showCustomUpload)}
+                    className="flex-1"
+                  >
+                    {showCustomUpload ? '收起上传' : '上传自定义头像'}
+                  </Button>
+                  {avatar.startsWith('data:') && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setAvatar('🐱');
+                        setShowCustomUpload(false);
+                      }}
                     >
-                      <span className="text-3xl">{option.emoji}</span>
-                    </button>
-                  ))}
+                      重置
+                    </Button>
+                  )}
                 </div>
               </div>
               
-              <div>
+              <div className="relative z-10">
                 <label className="block text-sm font-medium text-foreground mb-3">性别（可选）</label>
                 <div className="flex gap-3">
                   {genderOptions.map((option) => (
                     <button
                       key={option.id}
+                      type="button"
                       onClick={() => setGender(gender === option.id ? '' : option.id)}
-                      className={`flex-1 py-3 rounded-xl transition-all ${
+                      className={`flex-1 py-3 rounded-xl transition-all active:scale-95 ${
                         gender === option.id
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-secondary/50 hover:bg-secondary border border-input'

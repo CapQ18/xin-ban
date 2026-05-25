@@ -284,6 +284,7 @@ export default function TasksPage() {
               placeholder={taskType === 'main' ? '主线任务名称（如：考研冲刺）' : '支线任务名称（如：背50个单词）'}
               value={newTask.title}
               onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              className="bg-background text-foreground"
             />
             
             <Input

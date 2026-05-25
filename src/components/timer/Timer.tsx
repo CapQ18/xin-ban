@@ -175,7 +175,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
   return (
     <div className="flex flex-col items-center">
       {showMoodSelector && !isBreak && (
-        <div className="mb-6 animate-fade-in-up space-y-4 w-full">
+        <div className="mb-6 animate-fade-in-up space-y-4 w-full relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Smile className="w-5 h-5 text-primary" />
             <span className="text-sm font-medium text-muted-foreground">开始前，你的心情是？（可选）</span>
@@ -190,8 +190,8 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
                   setSelectedMood(mood.value);
                 }}
                 className={`rounded-full px-4 py-2 transition-all hover:scale-105 active:scale-95 ${
-                  selectedMood === mood.value 
-                    ? 'bg-primary text-primary-foreground' 
+                  selectedMood === mood.value
+                    ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary/50 hover:bg-secondary text-foreground border border-input'
                 }`}
               >
@@ -209,7 +209,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
             placeholder="今天想完成什么？"
-            className="w-full"
+            className="w-full bg-background text-foreground"
           />
 
           <div className="mt-6">
@@ -223,7 +223,7 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
                   key={sound.id}
                   type="button"
                   onClick={() => setBackgroundSound(backgroundSound === sound.id ? null : sound.id)}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all hover:scale-105 ${
+                  className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all hover:scale-105 active:scale-95 ${
                     backgroundSound === sound.id
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-secondary/50 hover:bg-secondary border border-input'
@@ -279,22 +279,20 @@ export function Timer({ onComplete, defaultDuration }: TimerProps) {
         </div>
       </div>
 
-      {!showMoodSelector && !showRatingModal && (
-        <div className="flex gap-3 mb-8">
-          {durationOptions.map((option) => (
-            <Button
-              key={option.value}
-              variant={duration === option.value ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => !isRunning && setDuration(option.value)}
-              disabled={isRunning}
-              className={`w-14 transition-all hover-lift ${duration === option.value ? 'bg-primary text-primary-foreground' : ''}`}
-            >
-              {option.label}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-3 mb-8">
+        {durationOptions.map((option) => (
+          <Button
+            key={option.value}
+            variant={duration === option.value ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setDuration(option.value)}
+            disabled={isRunning}
+            className={`w-14 transition-all hover-lift ${duration === option.value ? 'bg-primary text-primary-foreground' : ''}`}
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
 
       {!showRatingModal && (
         <div className="flex gap-4">
